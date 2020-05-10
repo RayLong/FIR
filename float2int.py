@@ -1,3 +1,7 @@
+'''
+convert float point number into fixed point number(32bit),
+range -1 < x < 1. 2's complement for negative value.
+'''
 def f2i(float_value):
     if float_value < 0:
         float_value = abs(float_value)
@@ -10,11 +14,14 @@ def f2i(float_value):
     res = 0
     while float_value != 0:
         float_value = float_value * 2.0
-        if float_value > 1.0:
+        if float_value >= 1.0:
             res |= pow(2, 31 - idx)
             float_value -= 1.0
+        elif idx == 31:
+            if float_value >= 0.5: # round up here, else round down
+                res |= 1
+            break
         if idx == 31:
-            res |= 1
             break
         idx += 1
     if sign_flag == 1:
