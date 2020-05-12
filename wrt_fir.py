@@ -48,6 +48,7 @@ import smbus
 import coeff
 import struct
 import float2int
+import sys
 ''' use ES9018 internal programable FIR filter as crossover
     =====================================================
     Channel maps for stereo 2 way crossover:
@@ -56,15 +57,30 @@ import float2int
     =====================================================
     we only enable stage 1
 '''
+if len(sys.argv) != 2:
+    print('This command supports only one parameter: sample rate =("96k", "44k1", "48k")')
+    quit()
+if sys.argv[1] == '96k':
+    lowpass_coeff = coeff.lp_96k
+    highpass_coeff = coeff.hp_96k
+elif sys.argv[1] == '48k':
+    lowpass_coeff = coeff.lp_48k
+    highpass_coeff = coeff.hp_48k
+elif sys.argv[1] == '44k1':
+    lowpass_coeff = coeff.lp_44k1
+    highpass_coeff = coeff.hp_44k1
+else:
+    print('Unsupported sample rate: {sys.argv[1]}')
+    quit()
 i2c = smbus.SMBus(1)
 i2c.write_byte_data(0x49, 37, 0x10)
 for idx in range(64):
     for i in range(8):
-        if i in (0, 2, 4, 6): # this is low pass filter, for testing
+        if i in (0, 2, 4, 6):  # this is low pass filter, for testing
             # if i in (0, 1, 4, 5):  this is real mapping
-            coeff_value = coeff.lp_44k1[idx]
+            coeff_value = lowpass_coeff[idx]
         else:
-            coeff_value = coeff.hp_44k1[idx]
+            coeff_value = highpass_coeff[idx]
         if coeff_value < 0:
             coeff_value = -coeff_value
             sign_flag = 1
