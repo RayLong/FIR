@@ -70,7 +70,7 @@ elif sys.argv[1] == '44k1':
     lowpass_coeff = coeff.lp_44k1
     highpass_coeff = coeff.hp_44k1
 else:
-    print('Unsupported sample rate: {sys.argv[1]}')
+    print(f'Unsupported sample rate: \'{sys.argv[1]}\'')
     quit()
 i2c = smbus.SMBus(1)
 i2c.write_byte_data(0x49, 37, 0x10)
